@@ -1,0 +1,46 @@
+#!/bin/sh
+
+OS="$(cat /etc/os-release | head -n 1 | sed 's/NAME=//g;s/"//g')"
+kernel="$(uname -r)"
+shell="$(echo $SHELL |sed 's/.*\///g')"
+packages="$(pacman -Qn | wc -l)"
+aurpackages="$(yay -Qm | wc -l)"
+uptime="$(uptime -p | awk '{ $1=""; print}')"
+
+if [ '$aurpackages' > 0 ]; then
+  show_package="$echo $packages(pacman) $aurpackages(aur)"
+else
+  show_package="$echo $packages(pacman)"
+fi
+
+## DEFINE COLORS
+bold='[1m'
+black='[30m'
+red='[31m'
+green='[32m'
+yellow='[33m'
+blue='[34m'
+magenta='[35m'
+cyan='[36m'
+white='[37m'
+grey='[90m'
+reset='[0m'
+
+## USER VARIABLES -- YOU CAN CHANGE THESE
+lc="${reset}${bold}${magenta}"  # labels
+nc="${reset}${bold}${yellow}"   # user
+hn="${reset}${bold}${blue}"     # hostname
+ic="${reset}${green}"           # info
+c0="${reset}${grey}"            # first color
+c1="${reset}${white}"           # second color
+c2="${reset}${yellow}"          # third color
+ 
+cat <<EOF
+${c0}      ___${reset}
+${c0}     (${c1}.. ${c0}\    ${lc}OS${hn}:        ${ic}${OS}${reset}
+${c0}     (${c2}<> ${c0}|    ${lc}Kernel${hn}:    ${ic}${kernel}${reset}
+${c0}    /${c1}/  \\ ${c0}\\   ${lc}Packages${hn}: ${ic}${show_package}${reset}
+${c0}   ( ${c1}|  | ${c0}/|  ${lc}Uptime${hn}:   ${ic}${uptime}${reset}
+${c2}  _${c0}/\\ ${c1}__)${c0}/${c2}_${c0})  ${lc}Shell${hn}:     ${ic}${shell}${reset}
+${c2}  \/${c0}-____${c2}\/${reset}
+EOF
